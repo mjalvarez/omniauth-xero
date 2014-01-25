@@ -5,6 +5,26 @@ module OmniAuth
   module Strategies
     class Xero < OmniAuth::Strategies::OAuth
 
+      def initialize(app, consumer_key=nil, consumer_secret=nil, options={}, &block)
+        app_type = options.delete(:app_type) || :public
+
+        client_options = if app_type.eql? :public
+                           {
+                               :request_token_url => 'https://api.xero.com/oauth/RequestToken',
+                               :authorize_url => 'https://api.xero.com/oauth/Authorize',
+                               :access_token_url => 'https://api.xero.com/oauth/AccessToken'
+                           }
+                         else
+                           {
+                               :request_token_url => 'https://api-partner.network.xero.com/oauth/RequestToken',
+                               :authorize_url => 'https://api.xero.com/oauth/Authorize',
+                               :access_token_url => 'https://api-partner.network.xero.com/oauth/AccessToken'
+                           }
+                         end
+
+        super(app, :xero, consumer_key, consumer_secret, client_options, options, &block)
+      end
+
       args [:consumer_key, :consumer_secret]
 
       option :client_options, {
